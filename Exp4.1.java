@@ -1,6 +1,3 @@
-Here is the code without comments:
-
-```java
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -113,4 +110,4 @@ public class EmployeeManagementSystem {
         system.addEmployee(101, "Charlie", 70000);
     }
 }
-```
+
