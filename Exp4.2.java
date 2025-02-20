@@ -1,81 +1,111 @@
-Experiment 4.2: Card Collection System
+import java.util.*;
 
-Objective:
-Develop a Java program that collects and stores playing cards to help users find all the cards of a given symbol (suit).
-The program should utilize the Collection interface (such as ArrayList, HashSet, or HashMap) to manage the card data efficiently.
+class Card {
+    String value;
+    String suit;
 
-Understanding the Problem Statement
+    Card(String value, String suit) {
+        this.value = value;
+        this.suit = suit;
+    }
 
-1. Card Structure:
-Each card consists of a symbol (suit) and a value (rank).
+    @Override
+    public String toString() {
+        return value + " of " + suit;
+    }
 
-Example card representations:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Card card = (Card) obj;
+        return value.equals(card.value) && suit.equals(card.suit);
+    }
 
-2. Operations Required:
-Add Cards → Store card details in a collection.
-Find Cards by Symbol (Suit) → Retrieve all cards belonging to a specific suit (e.g., all "Hearts").
-Display All Cards → Show all stored cards.
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, suit);
+    }
+}
 
-3. Collections Usage:
-ArrayList: To store cards in an ordered manner.
-HashSet: To prevent duplicate cards.
-HashMap<String, List<Card>>: To organize cards based on suits for faster lookup.
+public class CardCollectionSystem {
+    private Set<Card> cards;
+    private Map<String, List<Card>> cardsBySuit;
 
+    public CardCollectionSystem() {
+        cards = new HashSet<>();
+        cardsBySuit = new HashMap<>();
+    }
 
-Test Cases
+    public void addCard(String value, String suit) {
+        Card newCard = new Card(value, suit);
+        if (cards.contains(newCard)) {
+            System.out.println("Error: Card \"" + newCard + "\" already exists.");
+        } else {
+            cards.add(newCard);
+            cardsBySuit.computeIfAbsent(suit, k -> new ArrayList<>()).add(newCard);
+            System.out.println("Card added: " + newCard);
+        }
+    }
 
-Test Case 1: No Cards Initially
-Input:
-Display All Cards
-Expected Output:
-No cards found.
+    public void findCardsBySuit(String suit) {
+        if (cardsBySuit.containsKey(suit) && !cardsBySuit.get(suit).isEmpty()) {
+            for (Card card : cardsBySuit.get(suit)) {
+                System.out.println(card);
+            }
+        } else {
+            System.out.println("No cards found for " + suit + ".");
+        }
+    }
 
-Test Case 2: Adding Cards
-Input:
-Add Card: Ace of Spades
-Add Card: King of Hearts
-Add Card: 10 of Diamonds
-Add Card: 5 of Clubs
-Expected Output:
-Card added: Ace of Spades
-Card added: King of Hearts
-Card added: 10 of Diamonds
-Card added: 5 of Clubs
+    public void removeCard(String value, String suit) {
+        Card cardToRemove = new Card(value, suit);
+        if (cards.remove(cardToRemove)) {
+            cardsBySuit.get(suit).remove(cardToRemove);
+            System.out.println("Card removed: " + cardToRemove);
+        } else {
+            System.out.println("Error: Card \"" + cardToRemove + "\" not found.");
+        }
+    }
 
-Test Case 3: Finding Cards by Suit
-Input:
-Find All Cards of Suit: Hearts
-Expected Output:
-King of Hearts
+    public void displayAllCards() {
+        if (cards.isEmpty()) {
+            System.out.println("No cards found.");
+        } else {
+            for (Card card : cards) {
+                System.out.println(card);
+            }
+        }
+    }
 
-Test Case 4: Searching Suit with No Cards
-Input:
-Find All Cards of Suit: Diamonds
-(If no Diamonds were added)
-Expected Output:
-No cards found for Diamonds.
+    public static void main(String[] args) {
+        CardCollectionSystem system = new CardCollectionSystem();
 
-Test Case 5: Displaying All Cards
-Input:
-Display All Cards
-Expected Output:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
+        System.out.println("Test Case 1: No Cards Initially");
+        system.displayAllCards();
 
-Test Case 6: Preventing Duplicate Cards
-Input:
-Add Card: King of Hearts
-Expected Output:
-Error: Card "King of Hearts" already exists.
+        System.out.println("\nTest Case 2: Adding Cards");
+        system.addCard("Ace", "Spades");
+        system.addCard("King", "Hearts");
+        system.addCard("10", "Diamonds");
+        system.addCard("5", "Clubs");
 
-Test Case 7: Removing a Card
-Input:
-Remove Card: 10 of Diamonds
-Expected Output:
-Card removed: 10 of Diamonds
+        System.out.println("\nTest Case 3: Finding Cards by Suit");
+        system.findCardsBySuit("Hearts");
+
+        System.out.println("\nTest Case 4: Searching Suit with No Cards");
+        system.findCardsBySuit("Diamonds");
+
+        System.out.println("\nTest Case 5: Displaying All Cards");
+        system.displayAllCards();
+
+        System.out.println("\nTest Case 6: Preventing Duplicate Cards");
+        system.addCard("King", "Hearts");
+
+        System.out.println("\nTest Case 7: Removing a Card");
+        system.removeCard("10", "Diamonds");
+
+        System.out.println("\nDisplaying All Cards After Removal:");
+        system.displayAllCards();
+    }
+}
